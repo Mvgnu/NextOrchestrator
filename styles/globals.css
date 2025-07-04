@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Add any global custom styles below */
+body {
+  /* Example: Add a default background color or font */
+  /* background-color: theme('colors.background'); */
+  /* color: theme('colors.foreground'); */
+} 

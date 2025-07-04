@@ -1,0 +1,92 @@
+# Agent Feedback & Improvement
+
+This document describes how user feedback is collected and utilized to refine agent behavior within the MARS Next platform.
+
+## Submitting Feedback
+
+When interacting with an agent, you can provide feedback on its responses. This helps improve the agent's performance over time.
+
+Feedback includes:
+
+*   **Structured Ratings (1-5):**
+    *   `Accuracy`: How correct was the information?
+    *   `Relevance`: How relevant was the response to your query?
+    *   `Completeness`: Did the response cover the necessary points?
+    *   `Clarity`: Was the response easy to understand?
+*   **Comments:** General text feedback about the response.
+*   **Prompt Feedback:** Specific comments directed at the effectiveness or clarity of the *system prompt* used by the agent for that interaction.
+*   **Meta-Cognitive Input:** Your reflections on the interaction, why you provided the feedback, or suggestions for how the agent could improve its reasoning process.
+
+This feedback is submitted via the `submitAgentFeedback` function in the `feedbackService` and stored in the database (requires the `agent_feedback` table to be created via migrations).
+
+## Feedback Analysis
+
+The platform analyzes collected feedback for each agent using the `analyzeFeedback` function. This involves:
+
+1.  **Fetching Feedback:** Retrieving relevant feedback records from the database.
+2.  **Calculating Averages:** Computing average scores for each rating dimension (accuracy, relevance, etc.).
+3.  **Identifying Trends:** Determining strengths (high average ratings) and weaknesses (low average ratings).
+4.  **Generating Summary:** Providing a text summary of the analysis and recent user comments.
+
+## Automated Prompt Refinement (Updated)
+
+The feedback loop now supports direct, actionable prompt refinement:
+
+1. **Users submit feedback** on agent responses (ratings, comments, etc.).
+2. **Feedback is analyzed** (see `analyzeFeedback`) to identify strengths, weaknesses, and suggestions.
+3. **Prompt refinement instructions** are generated and appended to the agent's system prompt under a dedicated header (`--- User Feedback & Refinement Instructions (Auto-Generated) ---`).
+4. **Dashboard Integration:**
+    - In the Agent Feedback Dashboard, click the **"Apply Feedback to Prompt"** button to trigger this process.
+    - The backend updates the agent's prompt using the latest feedback analysis.
+    - The updated prompt is displayed in the dashboard for review.
+5. **API Integration:**
+    - The endpoint `/api/agents/[agentId]/apply-feedback` (POST) performs the update securely for the authenticated user.
+
+This closes the feedback loop, making agent improvement auditable and actionable from both the UI and API.
+
+## Agent Re-invocation (Now Supported)
+
+After refining an agent's prompt based on feedback, you can now immediately re-invoke the agent to test its updated behavior:
+
+1. **Dashboard Integration:**
+    - In the Agent Feedback Dashboard, click the **"Re-invoke Agent with Updated Prompt"** button.
+    - Enter a user message to test the agent.
+    - The backend runs the agent with its latest prompt and returns the new response, which is displayed in the dashboard.
+2. **API Integration:**
+    - The endpoint `/api/agents/[agentId]/reinvoke` (POST) accepts `{ userMessage, context? }` and returns the agent's new response.
+
+This closes the feedback loop: users can submit feedback, refine the prompt, and immediately observe the agent's improved output.
+
+---
+*This section is maintained as part of the living documentation process. Update as the implementation evolves.*
+
+## Current Implementation Status & TODOs
+
+**As of [Current Date - Please Update], the feedback system includes:**
+
+*   **Database Interaction:** The `submitAgentFeedback` and `getAgentFeedbackSummary` functions interact with the `agent_feedback` table (assuming migrations are applied and types regenerated - `@ts-ignore` comments may be present otherwise).
+*   **Basic Feedback Analysis:** The `analyzeFeedback` function provides a basic analysis based on aggregated ratings, identifying potential strengths and weaknesses.
+*   **Mocked Synthesis Feedback:** `submitSynthesisFeedback` is mocked, awaiting a `synthesis_feedback` table design.
+*   **Mocked Prompt Application:** `applyFeedbackToAgent` is mocked; it appends analysis notes to the prompt but doesn't perform LLM-based rewriting or database updates.
+*   **Placeholder UI:** The chat interface includes non-functional thumbs up/down buttons.
+
+**Outstanding TODOs / Required Work:**
+
+*   **Connect UI to Backend:** Implement `onClick` handlers for the feedback buttons in `ChatInterface.tsx` to call `FeedbackService.submitAgentFeedback` with appropriate data (message ID, agent ID, project ID, user ID, rating).
+*   **Define Feedback Data Structure:** Finalize the `agent_feedback` table schema (e.g., how to store ratings - separate columns vs. JSON? Handling comments?). Ensure migrations are applied and types regenerated.
+*   **Enhance Feedback Analysis:** Improve `analyzeFeedback` (potentially using LLM) to provide more insightful suggestions.
+*   **Implement Synthesis Feedback:** Design and implement the `synthesis_feedback` table and the corresponding `submitSynthesisFeedback` function if needed.
+*   **Implement Prompt Rewriting:** Implement the core logic in `applyFeedbackToAgent` using an LLM to rewrite the system prompt based on feedback.
+*   **Implement Agent Update:** Ensure `applyFeedbackToAgent` calls `AgentService.updateAgent` to save the rewritten prompt to the database.
+*   **Agent Re-invocation Logic:** Implement the final step of running the agent with the refined prompt (depends on non-mocked agent execution services).
+
+Addressing these items is necessary for a functional feedback loop.
+
+## Role-Based Access Control (RBAC)
+
+Certain actions related to agent configuration and system management require specific user roles.
+
+*   **Creating System Agent Presets:** Only users with the `admin` role can create agent presets where `is_system` is set to `true`. This is enforced in the `/api/agent-presets` endpoint.
+*   **Initializing System Presets:** Running the endpoint `/api/admin/initialize-presets` to populate default system presets also requires the `admin` role.
+
+Ensure that user roles are correctly configured in the `users` database table and that the necessary database migrations have been applied. 

@@ -6,6 +6,7 @@ import { AgentPresetService, type AgentPreset } from '@/lib/agent-preset-service
 import { ModelManagementService, type Provider } from '@/lib/model-management-service'; // Added
 import EditAgentClientPage from './edit-agent-client-page';
 import { notFound } from 'next/navigation';
+import clientLogger from '@/lib/client-logger'
 
 interface EditAgentPageProps {
   params: {
@@ -24,7 +25,7 @@ export default async function EditAgentPage({ params }: EditAgentPageProps) {
   const { id: projectId, agentId } = params;
 
   if (!projectId || !agentId) {
-    console.error('Project ID or Agent ID is missing from params');
+    clientLogger.error('Project ID or Agent ID is missing from params');
     notFound();
   }
 
@@ -44,14 +45,14 @@ export default async function EditAgentPage({ params }: EditAgentPageProps) {
     if (agentResult.status === 'fulfilled') {
       agent = agentResult.value;
     } else {
-      console.error('Error fetching agent:', agentResult.reason);
+      clientLogger.error('Error fetching agent:', agentResult.reason);
       fetchError = (agentResult.reason as Error)?.message || 'Could not load agent data.';
     }
 
     if (presetsResult.status === 'fulfilled') {
       presets = presetsResult.value;
     } else {
-      console.error('Error fetching presets:', presetsResult.reason);
+      clientLogger.error('Error fetching presets:', presetsResult.reason);
       // Non-critical, but we can append to fetchError or log
       fetchError = (fetchError ? fetchError + "; " : "") + ((presetsResult.reason as Error)?.message || 'Could not load presets.');
     }
@@ -59,22 +60,22 @@ export default async function EditAgentPage({ params }: EditAgentPageProps) {
     if (providersResult.status === 'fulfilled') { // Added
       providers = providersResult.value;
     } else {
-      console.error('Error fetching providers:', providersResult.reason);
+      clientLogger.error('Error fetching providers:', providersResult.reason);
       fetchError = (fetchError ? fetchError + "; " : "") + ((providersResult.reason as Error)?.message || 'Could not load providers.');
     }
 
     if (!agent) { // Agent is critical, if it failed to load, notFound
-      console.warn(`Agent with ID ${agentId} not found or critical data load failure.`);
+      clientLogger.warn(`Agent with ID ${agentId} not found or critical data load failure.`);
       notFound();
     }
     
     if (agent.project_id !== projectId || agent.user_id !== session.user.id) {
-        console.warn(`Security: User ${session.user.id} attempted to edit agent ${agentId} not belonging to them or project ${projectId}.`);
+        clientLogger.warn(`Security: User ${session.user.id} attempted to edit agent ${agentId} not belonging to them or project ${projectId}.`);
         notFound();
     }
 
   } catch (error: any) { // Catch for any unforeseen error in the try block logic itself
-    console.error(`Unexpected error fetching data for editing agent ${agentId}:`, error);
+    clientLogger.error(`Unexpected error fetching data for editing agent ${agentId}:`, error);
     fetchError = error.message || 'An unexpected error occurred.';
     if (!agent) notFound(); // Ensure notFound if agent is still null
   }

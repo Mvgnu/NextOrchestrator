@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { auth } from "@/lib/auth"
 import supabase from '@/lib/supabase'
+import clientLogger from '@/lib/client-logger'
 
 export default async function ProjectsPage() {
   const session = await auth()
@@ -18,7 +19,7 @@ export default async function ProjectsPage() {
     .order('updated_at', { ascending: false })
   
   if (error) {
-    console.error('Error fetching projects:', error)
+    clientLogger.error('Error fetching projects:', error)
   }
 
   return (

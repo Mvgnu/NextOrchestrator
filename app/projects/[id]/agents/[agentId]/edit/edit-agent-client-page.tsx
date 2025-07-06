@@ -8,6 +8,7 @@ import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import AgentCreationForm from '../../new/agent-creation-form' // CORRECTED path to reuse form
 import type { Agent } from '@/lib/agent-service'
 import type { AgentPreset } from '@/lib/agent-preset-service'
+import clientLogger from '@/lib/client-logger'
 import type { Provider } from '@/lib/model-management-service'
 
 interface EditAgentClientPageProps {
@@ -51,11 +52,11 @@ export default function EditAgentClientPage({
   
   // If presets fetch failed but agent data is available, we can still proceed
   if (fetchError && presets.length === 0) {
-      console.warn("Failed to fetch presets, proceeding with agent edit form without them.");
+      clientLogger.warn("Failed to fetch presets, proceeding with agent edit form without them.");
   }
   // Also log if providers fetch failed but we are proceeding
   if (fetchError && providers.length === 0) {
-    console.warn("Failed to fetch providers, proceeding with agent edit form without them.");
+    clientLogger.warn("Failed to fetch providers, proceeding with agent edit form without them.");
   }
 
   return (

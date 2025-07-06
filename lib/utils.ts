@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { format, formatDistanceToNow, parseISO } from "date-fns"
+import logger from './logger'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -15,7 +16,7 @@ export function formatDate(dateString: string): string {
   try {
     return format(parseISO(dateString), "MMM d, yyyy")
   } catch (error) {
-    console.error("Error formatting date:", error)
+    logger.error({ error }, 'Error formatting date')
     return dateString
   }
 }
@@ -29,7 +30,7 @@ export function timeAgo(dateString: string): string {
   try {
     return formatDistanceToNow(parseISO(dateString), { addSuffix: true })
   } catch (error) {
-    console.error("Error formatting relative time:", error)
+    logger.error({ error }, 'Error formatting relative time')
     return dateString
   }
 }

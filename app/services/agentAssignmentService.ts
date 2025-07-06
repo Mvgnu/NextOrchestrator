@@ -112,9 +112,11 @@ export async function removeAgentFromContext(
   return;
 }
 
-export default {
+const agentAssignmentService = {
   recommendAgentsForContext,
   assignAgentsToContext,
   getAgentsForContext,
-  removeAgentFromContext
-}; 
+  removeAgentFromContext,
+};
+
+export default agentAssignmentService;

@@ -1,4 +1,5 @@
-import { query, dbPool } from './db';
+import { query, dbPool } from './db'
+import logger from './logger'
 
 export type AgentContextRole = 'primary' | 'auxiliary' | 'specialist';
 
@@ -40,7 +41,7 @@ export const AgentContextService = {
       const { rows } = await query(sql, [contextId, userId]);
       return rows;
     } catch (error) {
-      console.error('Error fetching agent assignments for context:', error);
+      logger.error({ error }, 'Error fetching agent assignments for context');
       throw new Error('Failed to fetch agent assignments');
     }
   },
@@ -103,7 +104,7 @@ export const AgentContextService = {
       return newAssignments;
     } catch (error) {
       await poolClient.query('ROLLBACK');
-      console.error('Error setting agent assignments for context:', error);
+      logger.error({ error }, 'Error setting agent assignments for context');
       throw new Error('Failed to set agent assignments');
     } finally {
       poolClient.release(); // Release client back to the pool

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ContextService } from '@/lib/context-service'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import logger from '@/lib/logger'
 
 /**
  * @swagger
@@ -98,14 +99,14 @@ export async function POST(
         context: updated
       })
     } catch (error) {
-      console.error('Error accessing context:', error)
+      logger.error({ err: error }, 'Error accessing context')
       return NextResponse.json(
         { message: 'Error accessing context' },
         { status: 500 }
       )
     }
   } catch (error) {
-    console.error('Error saving digest:', error)
+    logger.error({ err: error }, 'Error saving digest')
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

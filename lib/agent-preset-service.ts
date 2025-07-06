@@ -1,4 +1,5 @@
 import { query, dbPool } from './db'; // Import PG query function and pool for transactions
+import logger from './logger'
 // import supabase from './supabase' // REMOVE
 // import type { Database } from '@/types/supabase' // REMOVE
 // import { AIProvider } from './ai-config' // Likely not used directly after refactor
@@ -102,7 +103,7 @@ export const AgentPresetService = {
       const { rows } = await query(sql, [userId]);
       return rows;
     } catch (error) {
-      console.error('Error fetching agent presets:', error);
+      logger.error({ error }, 'Error fetching agent presets');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch agent presets');
     }
   },
@@ -113,7 +114,7 @@ export const AgentPresetService = {
       const { rows } = await query(sql);
       return rows;
     } catch (error) {
-      console.error('Error fetching system presets:', error);
+      logger.error({ error }, 'Error fetching system presets');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch system presets');
     }
   },
@@ -124,7 +125,7 @@ export const AgentPresetService = {
       const { rows } = await query(sql, [presetId]);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error fetching preset:', error);
+      logger.error({ error }, 'Error fetching preset');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch preset');
     }
   },
@@ -160,7 +161,7 @@ export const AgentPresetService = {
       }
       return rows[0];
     } catch (error) {
-      console.error('Error creating agent preset:', error);
+      logger.error({ error }, 'Error creating agent preset');
       throw new Error(error instanceof Error ? error.message : 'Failed to create agent preset');
     }
   },
@@ -200,7 +201,7 @@ export const AgentPresetService = {
       const { rows } = await query(sql, values);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error updating agent preset:', error);
+      logger.error({ error }, 'Error updating agent preset');
       throw new Error(error instanceof Error ? error.message : 'Failed to update agent preset');
     }
   },
@@ -217,7 +218,7 @@ export const AgentPresetService = {
       const { rowCount } = await query(sql, [presetId, userId]);
       return rowCount !== null && rowCount > 0;
     } catch (error) {
-      console.error('Error deleting agent preset:', error);
+      logger.error({ error }, 'Error deleting agent preset');
       throw new Error(error instanceof Error ? error.message : 'Failed to delete agent preset');
     }
   },
@@ -231,7 +232,7 @@ export const AgentPresetService = {
       const { rows } = await query(sql, [presetId, userId]);
       return rows.length > 0;
     } catch (error) {
-      console.error('Error checking preset access:', error);
+      logger.error({ error }, 'Error checking preset access');
       return false; 
     }
   },
@@ -276,14 +277,14 @@ export const AgentPresetService = {
       );
 
       if (existingSystemPresets.length > 0) {
-        console.log('System presets already initialized.');
+        logger.info('System presets already initialized.')
         await poolClient.query('COMMIT');
         return;
       }
 
       const presetTemplates = this.getPredefinedPresets();
       if (presetTemplates.length === 0) {
-        console.log('No predefined system presets to initialize.');
+        logger.info('No predefined system presets to initialize.')
         await poolClient.query('COMMIT');
         return;
       }
@@ -322,13 +323,13 @@ export const AgentPresetService = {
         VALUES ${insertClauses.join(', ')};
       `; // No RETURNING needed here as we are just inserting
 
-      await poolClient.query(sql, values);
-      console.log(`Initialized ${presetTemplates.length} system presets.`);
+      await poolClient.query(sql, values)
+      logger.info(`Initialized ${presetTemplates.length} system presets.`)
       await poolClient.query('COMMIT');
 
     } catch (error) {
       await poolClient.query('ROLLBACK');
-      console.error('Failed to initialize system presets:', error);
+      logger.error({ error }, 'Failed to initialize system presets');
       // Potentially re-throw or handle error appropriately for application startup
       throw new Error(error instanceof Error ? error.message : 'Failed to initialize system presets');
     } finally {

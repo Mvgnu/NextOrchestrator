@@ -1,4 +1,5 @@
-import { query, dbPool } from './db'; // Import dbPool directly
+import { query, dbPool } from './db' // Import dbPool directly
+import logger from './logger'
 // import { Database } from '@/types/supabase'; // Removed Supabase type
 // import supabase from '@/lib/supabase'; // Removed Supabase client
 import { notFound } from 'next/navigation'; // Keep for now, may need adjustment
@@ -71,7 +72,7 @@ class VersionService {
       const { rows } = await query(sql, params);
       return rows[0];
     } catch (error) {
-      console.error('Error creating version:', error);
+      logger.error({ error }, 'Error creating version')
       const msg = error instanceof Error ? error.message : 'Failed to create version';
       throw new Error(`Failed to create version: ${msg}`);
     }
@@ -86,7 +87,7 @@ class VersionService {
       const { rows } = await query(sql, [contentId, contentType]);
       return rows;
     } catch (error) {
-      console.error('Error fetching versions:', error);
+      logger.error({ error }, 'Error fetching versions')
       const msg = error instanceof Error ? error.message : 'Failed to fetch versions';
       throw new Error(`Failed to fetch versions: ${msg}`);
     }
@@ -107,7 +108,7 @@ class VersionService {
       }
       return rows[0];
     } catch (error) {
-      console.error('Error fetching version:', error);
+      logger.error({ error }, 'Error fetching version')
       const msg = error instanceof Error ? error.message : 'Failed to fetch version';
       throw new Error(`Failed to fetch version: ${msg}`);
     }
@@ -122,7 +123,7 @@ class VersionService {
       const { rows } = await query(sql, [contentId, contentType]);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error fetching current version:', error);
+      logger.error({ error }, 'Error fetching current version')
       const msg = error instanceof Error ? error.message : 'Failed to fetch current version';
       throw new Error(`Failed to fetch current version: ${msg}`);
     }
@@ -173,7 +174,7 @@ class VersionService {
       const { rows } = await query(sql, values);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error updating version:', error);
+      logger.error({ error }, 'Error updating version')
       const msg = error instanceof Error ? error.message : 'Failed to update version';
       throw new Error(`Failed to update version: ${msg}`);
     }
@@ -221,7 +222,7 @@ class VersionService {
       return rows[0] || null;
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error('Error setting version as current (transaction rolled back):', error);
+      logger.error({ error }, 'Error setting version as current (transaction rolled back)')
       const msg = error instanceof Error ? error.message : 'Failed to set version as current';
       throw new Error(`Failed to set version as current: ${msg}`);
     } finally {
@@ -238,7 +239,7 @@ class VersionService {
       const result = await query(sql, [versionId]);
       return result.rowCount !== null && result.rowCount > 0;
     } catch (error) {
-      console.error('Error deleting version:', error);
+      logger.error({ error }, 'Error deleting version')
       const msg = error instanceof Error ? error.message : 'Failed to delete version';
       throw new Error(`Failed to delete version: ${msg}`);
     }

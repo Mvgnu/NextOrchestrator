@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import * as ProjectClient from '@/lib/project-client'
+import clientLogger from '@/lib/client-logger'
 
 export default function CreateProjectPage() {
   const [name, setName] = useState('')
@@ -37,7 +38,7 @@ export default function CreateProjectPage() {
       // Redirect to project page
       router.push(`/projects/${project.id}`)
     } catch (err: any) {
-      console.error('Error creating project:', err)
+      clientLogger.error('Error creating project:', err)
       setError(err.message || 'An error occurred while creating the project')
       setIsLoading(false)
     }

@@ -11,7 +11,7 @@ export default function GettingStartedPage() {
       <h2>1. Account Setup</h2>
       <p>
         Before you can create projects and agents, you need an account. If you 
-        don't have one already, follow these steps:
+          don&apos;t have one already, follow these steps:
       </p>
       <ul>
         <li>Navigate to the <a href="/auth/signin">Sign In</a> page.</li>
@@ -36,12 +36,12 @@ export default function GettingStartedPage() {
         Projects are containers for your work, including contexts and agents.
       </p>
       <ol>
-        <li>From the dashboard, click the "New Project" button.</li>
+          <li>From the dashboard, click the &quot;New Project&quot; button.</li>
         <li>You will be redirected to the project creation page.</li>
         <li>Enter a descriptive <strong>Name</strong> for your project.</li>
         <li>Optionally, add a <strong>Description</strong> to provide more context.</li>
-        <li>Click "Create Project".</li>
-        <li>You will be taken to the newly created project's page.</li>
+          <li>Click &quot;Create Project&quot;.</li>
+          <li>You will be taken to the newly created project&apos;s page.</li>
       </ol>
 
       <h2>4. Understanding the Project Interface</h2>

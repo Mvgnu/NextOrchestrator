@@ -1,12 +1,19 @@
-import { Pool } from 'pg';
+import { Pool } from 'pg'
+import logger from './logger'
+import { env } from './env'
+
+// purpose: manage PostgreSQL connection pooling and provide query helper
+// inputs: env database configuration
+// outputs: `query` function, `dbPool` object
+// status: stable
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  database: process.env.DB_NAME || 'marsnext_db',
-  user: process.env.DB_USER || 'marsnext_user',
-  password: process.env.DB_PASSWORD || 'strongpassword',
-  // ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  host: env.dbHost,
+  port: env.dbPort,
+  database: env.dbName,
+  user: env.dbUser,
+  password: env.dbPassword,
+  ssl: env.dbSsl ? { rejectUnauthorized: false } : undefined,
 });
 
 // Helper function to execute queries
@@ -15,13 +22,7 @@ export const query = (text: string, params?: any[]) => pool.query(text, params);
 // Export the pool itself for transaction management
 export { pool as dbPool };
 
-// Optional: A dedicated function to get a client could also be exported
-// export const getDbClient = async () => {
-//   const client = await pool.connect();
-//   return client;
-// };
-
-pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-}); 
+pool.on('error', err => {
+  logger.error({ err }, 'Unexpected error on idle client')
+  process.exit(-1)
+})

@@ -7,6 +7,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import * as googleAI from '@google-ai/generativelanguage'
 import { ApiUsageService } from './api-usage-service'
 import { ApiErrorHandler, ApiErrorType } from './api-error-handler'
+import logger from './logger'
 
 // Types
 interface AgentResponse {
@@ -73,7 +74,7 @@ export const AgentExecutor = {
             return response
           })
           .catch(error => {
-            console.error(`Unhandled error executing agent ${agent.id}:`, error)
+            logger.error({ error }, `Unhandled error executing agent ${agent.id}`)
             
             responses[agent.id] = {
               agentId: agent.id,
@@ -121,7 +122,7 @@ export const AgentExecutor = {
           const fallback = ApiErrorHandler.getFallbackModel(agent.provider, agent.model)
           
           if (fallback) {
-            console.log(`Provider ${agent.provider} (${agent.model}) is rate limited. Using fallback: ${fallback.provider} (${fallback.model})`)
+            logger.info(`Provider ${agent.provider} (${agent.model}) is rate limited. Using fallback: ${fallback.provider} (${fallback.model})`)
             
             // Create modified agent with fallback model
             const fallbackAgent = {
@@ -147,7 +148,7 @@ export const AgentExecutor = {
         
         // No fallback available or this is already a retry - wait and retry
         if (retryCount < MAX_RETRIES) {
-          console.log(`Provider ${agent.provider} is rate limited. Waiting ${retryAfter}ms before retry.`)
+          logger.info(`Provider ${agent.provider} is rate limited. Waiting ${retryAfter}ms before retry.`)
           await delay(retryAfter)
           return this.executeAgentWithRetry(agent, userMessage, context, userId, projectId, retryCount + 1)
         }
@@ -163,7 +164,7 @@ export const AgentExecutor = {
       const errorInfo = ApiErrorHandler.parseProviderError(error, agent.provider, agent.model)
       
       // Log the error
-      console.error(`Error executing agent ${agent.id} (${agent.provider}/${agent.model}):`, errorInfo.message)
+      logger.error({ error: errorInfo.message }, `Error executing agent ${agent.id} (${agent.provider}/${agent.model})`)
       
       // Track the error
       if (userId) {
@@ -184,7 +185,7 @@ export const AgentExecutor = {
         
         // Wait and retry
         const retryDelay = errorInfo.retryAfter || 30000
-        console.log(`Retryable error. Waiting ${retryDelay}ms before retry.`)
+        logger.info(`Retryable error. Waiting ${retryDelay}ms before retry.`)
         await delay(retryDelay)
         return this.executeAgentWithRetry(agent, userMessage, context, userId, projectId, retryCount + 1)
       }
@@ -193,7 +194,7 @@ export const AgentExecutor = {
       const fallback = ApiErrorHandler.getFallbackModel(agent.provider, agent.model)
       
       if (fallback) {
-        console.log(`Error with ${agent.provider} (${agent.model}). Using fallback: ${fallback.provider} (${fallback.model})`)
+        logger.info(`Error with ${agent.provider} (${agent.model}). Using fallback: ${fallback.provider} (${fallback.model})`)
         
         // Create modified agent with fallback model
         const fallbackAgent = {
@@ -319,7 +320,7 @@ export const AgentExecutor = {
             duration_ms: Date.now() - startTime
           })
         } catch (trackError) {
-          console.error('Error tracking API usage:', trackError)
+          logger.error({ trackError }, 'Error tracking API usage')
           // Continue even if tracking fails
         }
       }
@@ -350,7 +351,7 @@ export const AgentExecutor = {
             metadata: { error: error.message }
           })
         } catch (trackError) {
-          console.error('Error tracking API usage:', trackError)
+          logger.error({ trackError }, 'Error tracking API usage')
           // Continue even if tracking fails
         }
       }
@@ -416,7 +417,7 @@ export const AgentExecutor = {
                              
       if (ApiErrorHandler.isRateLimited(synthesisProvider, synthesisModel)) {
         const retryAfter = ApiErrorHandler.getRetryAfterTime(synthesisProvider, synthesisModel)
-        console.log(`Synthesis provider ${synthesisProvider} is rate limited. Waiting ${retryAfter}ms before attempting.`)
+        logger.info(`Synthesis provider ${synthesisProvider} is rate limited. Waiting ${retryAfter}ms before attempting.`)
         await delay(retryAfter)
       }
       
@@ -444,7 +445,7 @@ export const AgentExecutor = {
                 metadata: { type: 'synthesis' }
               })
             } catch (trackError) {
-              console.error('Error tracking synthesis usage:', trackError)
+              logger.error({ trackError }, 'Error tracking synthesis usage')
               // Continue even if tracking fails
             }
           }
@@ -473,7 +474,7 @@ export const AgentExecutor = {
                 metadata: { type: 'synthesis' }
               })
             } catch (trackError) {
-              console.error('Error tracking synthesis usage:', trackError)
+              logger.error({ trackError }, 'Error tracking synthesis usage')
               // Continue even if tracking fails
             }
           }
@@ -482,7 +483,7 @@ export const AgentExecutor = {
         }
       } catch (error) {
         // If synthesis with AI model fails, use a fallback mechanism
-        console.error('Error during synthesis with AI model:', error)
+        logger.error({ error }, 'Error during synthesis with AI model')
         
         // Parse and track the error
         if (userId) {
@@ -545,14 +546,14 @@ export const AgentExecutor = {
             metadata: { type: 'fallback_synthesis' }
           })
         } catch (trackError) {
-          console.error('Error tracking fallback synthesis usage:', trackError)
+          logger.error({ trackError }, 'Error tracking fallback synthesis usage')
           // Continue even if tracking fails
         }
       }
       
       return basicSynthesis
     } catch (error: any) {
-      console.error('Error synthesizing responses:', error)
+      logger.error({ error }, 'Error synthesizing responses')
       
       // Track error if userId is provided
       if (userId) {
@@ -571,7 +572,7 @@ export const AgentExecutor = {
             metadata: { type: 'synthesis', error: error.message }
           })
         } catch (trackError) {
-          console.error('Error tracking synthesis error:', trackError)
+          logger.error({ trackError }, 'Error tracking synthesis error')
           // Continue even if tracking fails
         }
       }

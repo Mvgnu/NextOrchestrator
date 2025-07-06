@@ -4,6 +4,7 @@ import type { Database } from '@/types/supabase'
 import { AgentExecutor } from './agent-executor'
 import { AgentService } from './agent-service'
 import { ContextService } from './context-service'
+import logger from './logger'
 
 type Chat = Database['public']['Tables']['chats']['Row']
 type ChatInsert = Database['public']['Tables']['chats']['Insert']
@@ -24,7 +25,7 @@ export const ChatService = {
       .order('created_at', { ascending: true })
     
     if (error) {
-      console.error('Error fetching chats:', error)
+      logger.error({ error }, 'Error fetching chats')
       throw error
     }
     
@@ -42,7 +43,7 @@ export const ChatService = {
       .single()
     
     if (error) {
-      console.error('Error fetching chat:', error)
+      logger.error({ error }, 'Error fetching chat')
       throw error
     }
     
@@ -124,7 +125,7 @@ export const ChatService = {
       
       return updatedChat
     } catch (error: any) {
-      console.error('Error processing message:', error)
+      logger.error({ error }, 'Error processing message')
       throw error
     }
   },
@@ -139,7 +140,7 @@ export const ChatService = {
       .eq('id', chatId)
     
     if (error) {
-      console.error('Error deleting chat:', error)
+      logger.error({ error }, 'Error deleting chat')
       throw error
     }
   },

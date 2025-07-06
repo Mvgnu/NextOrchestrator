@@ -275,7 +275,7 @@ export default function AgentFeedbackDashboard({ projectId, agentId, userId }: A
           <CardHeader>
             <CardTitle>Detailed Performance Analytics</CardTitle>
             <CardDescription>
-              A deeper look into your agent's performance and user feedback
+              A deeper look into your agent&apos;s performance and user feedback
             </CardDescription>
           </CardHeader>
           <CardContent>

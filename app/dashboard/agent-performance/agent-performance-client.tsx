@@ -101,7 +101,7 @@ export default function AgentPerformanceClient() {
     };
     
     fetchAgentPerformance();
-  }, [session, timeframe, status]);
+  }, [session, timeframe, status, selectedAgent]);
   
   // Update trend data when agent selection changes
   useEffect(() => {

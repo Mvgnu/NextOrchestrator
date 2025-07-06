@@ -17,6 +17,7 @@ import { Slider } from '@/components/ui/slider'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import supabase from '@/lib/supabase'
+import clientLogger from '@/lib/client-logger'
 
 interface AgentEditFormProps {
   projectId: string
@@ -113,7 +114,7 @@ export default function AgentEditForm({ projectId, userId, contexts, agent }: Ag
       router.push(`/projects/${projectId}`)
       router.refresh()
     } catch (err) {
-      console.error('Error updating agent:', err)
+      clientLogger.error('Error updating agent:', err)
       setError('Failed to update agent. Please try again.')
       setIsSubmitting(false)
     }

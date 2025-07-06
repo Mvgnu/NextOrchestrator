@@ -157,7 +157,7 @@ export default function ApiKeyManager({ initialApiKeys, userId }: ApiKeyManagerP
       
       {apiKeys.length === 0 ? (
         <div className="text-center py-8 border rounded-lg">
-          <p className="text-muted-foreground">You haven't added any API keys yet.</p>
+          <p className="text-muted-foreground">You haven&apos;t added any API keys yet.</p>
           <Button 
             variant="outline" 
             size="sm" 

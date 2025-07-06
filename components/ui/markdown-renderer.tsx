@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, memo } from 'react'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkCodeTitles from 'remark-code-titles'
@@ -145,7 +146,14 @@ export const MarkdownRenderer = ({
     ),
     hr: ({ node, ...props }: any) => <hr className="my-8 border-muted" {...props} />,
     img: ({ node, alt, ...props }: any) => (
-      <img className="rounded-md max-w-full h-auto my-4" alt={alt} {...props} />
+      <Image
+        className="rounded-md max-w-full h-auto my-4"
+        alt={alt}
+        width={0}
+        height={0}
+        sizes="100vw"
+        {...props}
+      />
     ),
     table: ({ node, ...props }: any) => (
       <div className="my-6 w-full overflow-y-auto">

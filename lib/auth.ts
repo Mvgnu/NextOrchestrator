@@ -8,6 +8,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import NextAuth from "next-auth"; // Import NextAuth
+import logger from './logger'
 
 // PG Adapter imports
 import PostgresAdapter from "@auth/pg-adapter"
@@ -47,13 +48,13 @@ export const authConfig: NextAuthConfig = {
           const result = await query('SELECT id, name, email, image, password_hash FROM users WHERE email = $1', [credentials.email]);
           
           if (result.rows.length === 0) {
-            console.error('User not found with email:', credentials.email);
+            logger.error({ email: credentials.email }, 'User not found with email')
             return null;
           }
           const user = result.rows[0] as UserWithToken; // Cast to include password_hash
 
           if (!user.password_hash) {
-            console.error('User found but missing password hash:', user.email);
+            logger.error({ email: user.email }, 'User found but missing password hash')
             return null; // Or handle as appropriate (e.g. user signed up via OAuth)
           }
 
@@ -61,7 +62,7 @@ export const authConfig: NextAuthConfig = {
           const isValid = await bcrypt.compare(credentials.password, user.password_hash);
 
           if (!isValid) {
-            console.error('Invalid password for user:', user.email);
+            logger.error({ email: user.email }, 'Invalid password for user')
             return null
           }
           
@@ -91,7 +92,7 @@ export const authConfig: NextAuthConfig = {
             accessToken,
           };
         } catch (error) {
-          console.error('Credential authentication error:', error)
+          logger.error({ error }, 'Credential authentication error')
           return null
         }
       }
@@ -133,7 +134,7 @@ export const authConfig: NextAuthConfig = {
         token.role = 'user'; // Default role
       } else if (!token.id) {
         // Should not happen if sign-in was successful
-        console.warn("JWT Callback: token.id is missing.");
+        logger.warn('JWT Callback: token.id is missing.')
       }
       
       return token;

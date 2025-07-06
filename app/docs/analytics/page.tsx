@@ -27,7 +27,7 @@ export default function DocsAnalyticsPage() {
         <li><strong>Usage Breakdown:</strong> Shows token usage percentage attributed to different projects, AI providers (OpenAI, Anthropic, etc.), and specific models (GPT-4, Claude 3, etc.). Uses progress bars for easy comparison.</li>
       </ul>
       <blockquote className="border-l-4 border-yellow-500 pl-4 my-4">
-        <p><strong>Note:</strong> A "Monthly Limit" is not currently displayed or enforced in this dashboard.</p>
+          <p><strong>Note:</strong> A &quot;Monthly Limit&quot; is not currently displayed or enforced in this dashboard.</p>
         <p>
           <strong>Cost Estimation:</strong> Costs are estimated within <code>api-usage-service.ts</code> using a hardcoded price list (<code>COST_PER_1K_TOKENS</code>) for various models based on prompt and completion tokens. 
           These prices reflect approximate rates from sometime in 2023 and may not be perfectly accurate or up-to-date with current provider pricing. 
@@ -47,7 +47,7 @@ export default function DocsAnalyticsPage() {
             <li><strong>Average Rating:</strong> The average rating given to this agent via the <a href="/docs/chat#feedback">feedback mechanism</a> in the Chat Interface. Includes a trend indicator showing change versus the previous period.</li>
             <li><strong>Usage Count:</strong> The total number of times this agent was invoked (based on feedback/rating interactions).</li>
             <li><strong>Token Usage:</strong> Total tokens consumed specifically by this agent. Includes a trend indicator.</li>
-            <li><strong>Estimated Cost:</strong> Total estimated cost for the agent's interactions.</li>
+            <li><strong>Estimated Cost:</strong> Total estimated cost for the agent&apos;s interactions.</li>
           </ul>
         </li>
         <li><strong>Performance Trends Chart:</strong> A chart visualizing trends over the selected timeframe. You can toggle between:

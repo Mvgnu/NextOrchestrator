@@ -71,11 +71,13 @@ marsnext/
 
 ## Getting Started
 
+
 1. **Setup**
    ```bash
    npm install
+   # Or run the helper script
+   ./scripts/setup-dev.sh
    ```
-
 2. **Environment Variables**
    Create a `.env.local` file with the following:
    ```
@@ -98,10 +100,12 @@ marsnext/
    npm run dev
    ```
 
-4. **Build**
+4. **Build & Start**
    ```bash
    npm run build
    npm start
+   # Or run the deployment helper
+   ./scripts/deploy.sh
    ```
 
 ## Feature Roadmap

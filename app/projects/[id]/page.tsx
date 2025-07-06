@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"
 import * as ProjectService from '@/lib/project-service'
 import { ContextService, Context } from '@/lib/context-service'
 import { AgentService, Agent } from '@/lib/agent-service'
+import clientLogger from '@/lib/client-logger'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -28,7 +29,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   try {
     project = await ProjectService.getProject(projectId, userId);
   } catch (error) {
-    console.error(`Project fetch error for ${projectId}, user ${userId}:`, error);
+    clientLogger.error(`Project fetch error for ${projectId}, user ${userId}:`, error);
     notFound();
   }
   
@@ -40,7 +41,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   try {
     contexts = await ContextService.getProjectContexts(projectId);
   } catch (error) {
-    console.error(`Error fetching contexts via ContextService for project ${projectId}:`, error);
+    clientLogger.error(
+      `Error fetching contexts via ContextService for project ${projectId}:`,
+      error,
+    );
   }
   
    let agents: Agent[] = [];
@@ -48,7 +52,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       const userAgents = await AgentService.getUserAgents(userId);
       agents = userAgents.filter(agent => agent.project_id === projectId);
    } catch (error) {
-      console.error(`Error fetching agents via AgentService for project ${projectId}:`, error);
+      clientLogger.error(`Error fetching agents via AgentService for project ${projectId}:`, error);
    }
   
   return (

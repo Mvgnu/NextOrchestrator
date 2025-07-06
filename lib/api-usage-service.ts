@@ -1,4 +1,11 @@
-import { query } from './db'; // Import PG query function
+import { query } from './db' // Import PG query function
+import logger from './logger'
+
+// purpose: track API usage data and provide analytics summaries
+// inputs: database query helper, usage objects
+// outputs: usage records and aggregated statistics
+// status: stable
+// depends_on: db.ts, logger.ts
 // import supabase from './supabase' // REMOVE
 // import type { Database } from '@/types/supabase' // REMOVE
 // import { AIProvider } from './ai-config' // AIProvider might not be used directly in this file after refactor or defined elsewhere
@@ -161,7 +168,7 @@ export const ApiUsageService = {
       }
       return rows[0] as ApiUsage;
     } catch (error) {
-      console.error('Error tracking API usage:', error);
+      logger.error({ error }, 'Error tracking API usage');
       throw new Error(error instanceof Error ? error.message : 'Failed to track API usage');
     }
   },
@@ -170,8 +177,8 @@ export const ApiUsageService = {
    * Get usage summary for a user within a date range
    */
   async getUserUsageSummary(
-    userId: string, 
-    startDate: Date, 
+    userId: string,
+    startDate: Date,
     endDate: Date
   ): Promise<UsageSummary> {
     const startDateStr = startDate.toISOString();
@@ -279,8 +286,52 @@ export const ApiUsageService = {
       return summary;
 
     } catch (error) {
-      console.error('Error fetching user usage summary:', error);
+      logger.error({ error }, 'Error fetching user usage summary');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch usage summary');
+    }
+  },
+
+  /**
+   * Lightweight stats for the dashboard.
+   */
+  async getUserDashboardStats(
+    userId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ total_tokens: number; avg_rating: number | null }> {
+    const startDateStr = startDate.toISOString();
+    const endDateStr = endDate.toISOString();
+
+    const usageSql = `
+      SELECT COALESCE(SUM(tokens_total), 0) AS total_tokens
+      FROM api_usage
+      WHERE user_id = $1
+        AND created_at >= $2
+        AND created_at <= $3;
+    `;
+
+    const ratingSql = `
+      SELECT AVG(rating) AS avg_rating
+      FROM agent_ratings
+      WHERE user_id = $1
+        AND created_at >= $2
+        AND created_at <= $3;
+    `;
+
+    try {
+      const usagePromise = query(usageSql, [userId, startDateStr, endDateStr]);
+      const ratingPromise = query(ratingSql, [userId, startDateStr, endDateStr]);
+      const [usageResult, ratingResult] = await Promise.all([usagePromise, ratingPromise]);
+      const totalTokens = parseInt(usageResult.rows[0]?.total_tokens ?? '0', 10);
+      const avgRating = ratingResult.rows[0]?.avg_rating
+        ? parseFloat(ratingResult.rows[0].avg_rating)
+        : null;
+      return { total_tokens: totalTokens, avg_rating: avgRating };
+    } catch (error) {
+      logger.error({ error }, 'Error fetching dashboard stats');
+      throw new Error(
+        error instanceof Error ? error.message : 'Failed to fetch dashboard stats'
+      );
     }
   },
 
@@ -328,7 +379,7 @@ export const ApiUsageService = {
 
       return { data: records, count: totalCount };
     } catch (error) {
-      console.error('Error fetching API usage records:', error);
+      logger.error({ error }, 'Error fetching API usage records');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch usage records');
     }
   },
@@ -453,7 +504,7 @@ export const ApiUsageService = {
       });
       return performanceSummaries;
     } catch (error) {
-      console.error('Error fetching agent performance data:', error);
+      logger.error({ error }, 'Error fetching agent performance data');
       throw new Error(error instanceof Error ? error.message : 'Failed to fetch agent performance data');
     }
   }

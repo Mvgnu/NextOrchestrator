@@ -17,6 +17,7 @@ import synthesisService, {
 import { AgentContextAssignment } from '@/app/services/agentAssignmentService'
 import { ContextDigest } from '@/app/services/contextService'
 import FeedbackPanel from './FeedbackPanel'
+import clientLogger from '@/lib/client-logger'
 
 // Adjusted interface to match what the synthesisService expects
 interface Agent {
@@ -92,7 +93,7 @@ export default function SynthesisOrchestrator({
         onSynthesisComplete(result.result);
       }
     } catch (err) {
-      console.error('Error running synthesis:', err);
+      clientLogger.error('Error running synthesis:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setLoading(false);
@@ -265,7 +266,7 @@ export default function SynthesisOrchestrator({
             </div>
             
             <div className="text-sm text-muted-foreground mt-1">
-              <span>Query: "{orchestration.query}"</span>
+              <span>Query: &quot;{orchestration.query}&quot;</span>
               <span className="mx-2">|</span>
               <span>Started: {orchestration.startedAt.toLocaleTimeString()}</span>
               {orchestration.completedAt && (

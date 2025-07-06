@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ArrowRight } from 'lucide-react'
+import clientLogger from '@/lib/client-logger'
 
 export const metadata: Metadata = {
   title: 'Context Management',
@@ -38,7 +39,7 @@ export default async function ProjectContextPage({ params }: ProjectContextPageP
        redirect('/dashboard?error=project_not_found')
     }
   } catch (error) {
-     console.error('Failed to fetch project:', error)
+     clientLogger.error('Failed to fetch project:', error)
      redirect('/dashboard?error=project_fetch_failed')
   }
   

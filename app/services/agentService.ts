@@ -195,6 +195,8 @@ export async function executeParallelAgents(
   };
 }
 
-export default {
-  executeParallelAgents
-}; 
+const agentService = {
+  executeParallelAgents,
+};
+
+export default agentService;

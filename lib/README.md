@@ -72,4 +72,22 @@ The schema includes:
 
 ### Other Services
 
-[List other services here...] 
+- **Database Connection (`db.ts`)**: initializes a PostgreSQL connection pool via `pg` and exports a `query` helper.
+
+### Client Logger (`client-logger.ts`)
+
+Provides a simple wrapper around browser console methods. Debug messages are suppressed when `NODE_ENV` is `production`, while errors are always logged.
+
+### API Usage Service (`api-usage-service.ts`)
+
+Tracks token usage for model interactions and aggregates statistics for dashboards. Key methods include `trackUsage`, `getUserUsageSummary`, and `getUserDashboardStats`.
+
+### Environment Helper (`env.ts`)
+
+Validates required environment variables with Zod and exposes a typed `env` object. Includes helper methods like `hasRequiredEnvVars` and `getApiKeyForProvider`.
+
+### Logger (`logger.ts`)
+
+Exports a `pino` logger instance configured for pretty output in development and JSON in production.
+
+

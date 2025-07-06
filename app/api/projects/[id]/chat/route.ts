@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@/lib/auth";
 import { AgentService } from '@/lib/agent-service';
+import { ProjectService } from '@/lib/project-service';
 import { synthesisService, ChatMessage, AgentResponseChunk } from '@/app/services/synthesisService';
 // Update ContextService import path and type
 import { ContextService, Context } from '@/lib/context-service'; 
@@ -58,13 +59,12 @@ export async function POST(
     }
     const userId = session.user.id;
 
-    // 2. Authorization 
-    // TODO: Implement robust project access check.
-    // Current check is implicitly based on fetching user-owned agents/contexts.
-    // A robust check might involve verifying project membership via a separate table 
-    // (e.g., project_members) or checking roles if collaborators are added.
-    // Requires definition of access control rules (e.g., roles, permissions).
-    const hasProjectAccess = true; // Placeholder - Assumes access if authenticated
+    // 2. Authorization
+    // Verify the user actually owns the project (or has explicit access)
+    const hasProjectAccess = await ProjectService.userHasAccessToProject(
+      userId,
+      projectId
+    )
     if (!hasProjectAccess) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

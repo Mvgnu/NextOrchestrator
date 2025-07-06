@@ -7,8 +7,8 @@ export default function DocsHomePage() {
       <h1 className="text-3xl font-bold mb-6">MARS Next Documentation</h1>
       
       <p className="text-lg text-muted-foreground mb-8">
-        Welcome to the official documentation for MARS Next. Here you'll find everything 
-        you need to get started and make the most out of the platform's features.
+          Welcome to the official documentation for MARS Next. Here you&apos;ll find everything
+          you need to get started and make the most out of the platform&apos;s features.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 not-prose">

@@ -1,4 +1,5 @@
 import { query } from './db'; // Import our PostgreSQL query function
+import logger from './logger'
 // import supabase from './supabase'; // Removed Supabase
 // import type { Database } from '@/types/supabase'; // Removed Supabase types
 // import { SupabaseClient, createClient } from '@supabase/supabase-js'; // Removed Supabase
@@ -49,7 +50,7 @@ export const AgentService = {
       const { rows } = await query(sql, [userId]);
       return rows;
     } catch (error) {
-      console.error('Error fetching user agents:', error);
+      logger.error({ error }, 'Error fetching user agents')
       throw new Error('Failed to fetch user agents');
     }
   },
@@ -63,7 +64,7 @@ export const AgentService = {
       const { rows } = await query(sql, [agentId]);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error fetching agent:', error);
+      logger.error({ error }, 'Error fetching agent')
       throw new Error('Failed to fetch agent');
     }
   },
@@ -89,7 +90,7 @@ export const AgentService = {
       ]);
       return rows[0];
     } catch (error) {
-      console.error('Error creating agent:', error);
+      logger.error({ error }, 'Error creating agent')
       const errorMessage = error instanceof Error ? error.message : 'Failed to create agent';
       throw new Error(errorMessage);
     }
@@ -147,7 +148,7 @@ export const AgentService = {
       const { rows } = await query(sql, values);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error updating agent:', error);
+      logger.error({ error }, 'Error updating agent')
       const errorMessage = error instanceof Error ? error.message : 'Failed to update agent';
       throw new Error(errorMessage);
     }
@@ -164,7 +165,7 @@ export const AgentService = {
       const result = await query(sql, [agentId, projectId, userId]);
       return result.rowCount !== null && result.rowCount > 0;
     } catch (error) {
-      console.error('Error deleting agent:', error);
+      logger.error({ error }, 'Error deleting agent')
       throw new Error('Failed to delete agent');
     }
   },
@@ -178,17 +179,17 @@ export const AgentService = {
       const { rows } = await query(sql, [agentId, userId]);
       return rows.length > 0;
     } catch (error) {
-      console.error('Error checking agent access:', error);
+      logger.error({ error }, 'Error checking agent access')
       // In case of error, safer to assume no access
       return false;
     }
   },
 
   /**
-   * Get all agents for a specific project (STUBBED - needs schema update or join table)
+   * Get all agents for a specific project. Assumes the user owns the project
+   * or otherwise has access to it.
    */
   async getProjectAgents(projectId: string, userId: string): Promise<Agent[]> {
-    // console.warn('getProjectAgents: Not fully implemented. Current schema does not link agents directly to projects.');
     // Implementation for fetching agents associated with a specific project
     // This assumes the user (userId) must own the agents or have access via the project.
     // If project ownership is separate, you might first verify user has access to projectId.
@@ -207,7 +208,7 @@ export const AgentService = {
       const { rows } = await query(sql, [projectId, userId]);
       return rows;
     } catch (error) {
-      console.error(`Error fetching agents for project ${projectId}:`, error);
+      logger.error({ error }, `Error fetching agents for project ${projectId}`)
       throw new Error('Failed to fetch project agents');
     }
   }

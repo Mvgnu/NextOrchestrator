@@ -1,6 +1,7 @@
 import supabase from './supabase'
 import type { Database } from '@/types/supabase'
 import { AIProvider, providers } from './ai-config'
+import logger from './logger'
 
 // Type definitions for API keys
 export type ApiKey = Database['public']['Tables']['api_keys']['Row']
@@ -33,7 +34,7 @@ export const ApiKeyService = {
       .order('created_at', { ascending: false })
     
     if (error) {
-      console.error('Error fetching API keys:', error)
+      logger.error({ error }, 'Error fetching API keys')
       throw error
     }
     
@@ -84,7 +85,7 @@ export const ApiKeyService = {
       .single()
     
     if (error) {
-      console.error('Error creating API key:', error)
+      logger.error({ error }, 'Error creating API key')
       throw error
     }
     
@@ -106,7 +107,7 @@ export const ApiKeyService = {
       .single()
     
     if (error) {
-      console.error('Error updating API key:', error)
+      logger.error({ error }, 'Error updating API key')
       throw error
     }
     
@@ -123,7 +124,7 @@ export const ApiKeyService = {
       .eq('id', id)
     
     if (error) {
-      console.error('Error deleting API key:', error)
+      logger.error({ error }, 'Error deleting API key')
       throw error
     }
   },

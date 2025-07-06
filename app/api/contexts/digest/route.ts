@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ContextService } from '@/lib/context-service'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import logger from '@/lib/logger'
 
 /**
  * @swagger
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
       digestedContent
     })
   } catch (error) {
-    console.error('Content digestion error:', error)
+    logger.error({ err: error }, 'Content digestion error')
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

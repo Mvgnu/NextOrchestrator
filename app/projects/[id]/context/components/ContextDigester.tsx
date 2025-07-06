@@ -20,12 +20,13 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Upload, Download, FileText, Check, AlertCircle, RefreshCw, Loader2 } from 'lucide-react'
+import { Upload, Download, FileText, Check, AlertCircle, RefreshCw, Loader2, Save } from 'lucide-react'
 import contextService, { ContextFile, ContextDigest } from '@/app/services/contextService'
 import * as ContextClient from '@/lib/context-client'
 import AgentAssignmentPanel from './AgentAssignmentPanel'
 import ContextAppender from './ContextAppender'
 import { useToast } from '@/components/ui/use-toast'
+import clientLogger from '@/lib/client-logger'
 import * as AgentClient from '@/lib/agent-client'
 
 interface ContextDigesterProps {
@@ -58,7 +59,7 @@ export default function ContextDigester({ projectId, userId }: ContextDigesterPr
           setSelectedAgentId(projectAgents[0].id)
         }
       } catch (error) {
-        console.error('Failed to load agents:', error)
+        clientLogger.error('Failed to load agents:', error)
       }
     }
     
@@ -85,7 +86,7 @@ export default function ContextDigester({ projectId, userId }: ContextDigesterPr
         fileInputRef.current.value = ''
       }
     } catch (error) {
-      console.error('Error uploading files:', error)
+      clientLogger.error('Error uploading files:', error)
     } finally {
       setUploadLoading(false)
     }
@@ -146,7 +147,7 @@ export default function ContextDigester({ projectId, userId }: ContextDigesterPr
       setDigest(result)
       setActiveTab('digest')
     } catch (error) {
-      console.error('Error generating digest:', error)
+      clientLogger.error('Error generating digest:', error)
       toast({
         title: "Digest Error",
         description: "Failed to generate content digest. Please try again.",
@@ -186,7 +187,7 @@ export default function ContextDigester({ projectId, userId }: ContextDigesterPr
         description: "Context digest has been saved successfully.",
       });
     } catch (error: any) {
-      console.error("Error saving digest:", error);
+      clientLogger.error("Error saving digest:", error);
       toast({
         title: "Save Error",
         description: error.message || "Failed to save digest",
@@ -243,7 +244,7 @@ export default function ContextDigester({ projectId, userId }: ContextDigesterPr
         description: 'Context saved successfully',
       })
     } catch (error) {
-      console.error('Error saving context:', error)
+      clientLogger.error('Error saving context:', error)
       toast({
         title: 'Error',
         description: 'Failed to save context',

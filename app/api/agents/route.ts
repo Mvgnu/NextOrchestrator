@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AgentService } from '@/lib/agent-service'
 import { auth } from "@/lib/auth"
+import logger from '@/lib/logger'
 
 /**
  * @swagger
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ agents });
   } catch (error: any) {
-    console.error('Error fetching agents:', error);
+    logger.error({ error }, 'Error fetching agents');
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
       user_id: userId,
     };
 
-    console.log("Creating agent with data:", {
+    logger.debug("Creating agent with data:", {
       ...agentData,
       system_prompt: agentData.system_prompt?.substring(0, 50) + (agentData.system_prompt?.length > 50 ? '...' : '')
     });
@@ -150,12 +151,12 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ agent }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating agent:', error);
+    logger.error({ error }, 'Error creating agent');
     const errorCode = error?.code
     const errorDetails = error?.details
     const errorMessage = error?.message || 'Unknown error'
     
-    console.error(`Error Code: ${errorCode}, Details: ${errorDetails}, Message: ${errorMessage}`)
+    logger.error({ errorCode, errorDetails }, `Error creating agent: ${errorMessage}`)
 
     return NextResponse.json({ 
       error: errorMessage,

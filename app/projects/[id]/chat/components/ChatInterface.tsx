@@ -7,6 +7,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Send, RefreshCw } from 'lucide-react'
 import agentService, { ExecutionContext } from '@/app/services/agentService'
+import clientLogger from '@/lib/client-logger'
 
 interface Agent {
   id: string
@@ -131,7 +132,7 @@ export default function ChatInterface({ projectId, userId, agents, projectName }
         setMessages(prev => [...prev, assistantMessage])
       }
     } catch (error) {
-      console.error('Error in agent execution:', error)
+      clientLogger.error('Error in agent execution:', error)
       
       // Add error message
       const errorMessage: Message = {

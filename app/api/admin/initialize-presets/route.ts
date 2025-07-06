@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AgentPresetService } from '@/lib/agent-preset-service'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import logger from '@/lib/logger'
 
 /**
  * @swagger
@@ -44,17 +45,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (session.user.role !== 'admin') {
-      console.warn(`User ${session.user.id} (role: ${session.user.role}) attempted admin action: initialize presets.`);
+      logger.warn(
+        { userId: session.user.id, role: session.user.role },
+        'Non-admin attempted to initialize presets'
+      )
       return NextResponse.json({ error: 'Forbidden: Admin privileges required.' }, { status: 403 });
     }
     
     // User is authenticated and is an admin, proceed.
-    console.log(`Admin user ${session.user.id} initializing system presets.`);
+    logger.info({ userId: session.user.id }, 'Initializing system presets')
     await AgentPresetService.initializeSystemPresets();
     
     return NextResponse.json({ success: true, message: 'System presets initialized successfully' });
   } catch (error: any) {
-    console.error('Error initializing system presets:', error);
+    logger.error({ err: error }, 'Error initializing system presets')
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-} 
+}

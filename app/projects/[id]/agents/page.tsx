@@ -10,8 +10,11 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { PlusCircledIcon, Pencil2Icon, TrashIcon } from '@radix-ui/react-icons';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List } from 'react-window';
 import {notFound, redirect} from 'next/navigation';
 import { AgentService, type Agent } from '@/lib/agent-service'; // Import AgentService and Agent type
+import clientLogger from '@/lib/client-logger'
 // import { cookies } from 'next/headers'; // No longer needed
 
 interface ProjectAgentsPageProps {
@@ -39,7 +42,7 @@ export default async function ProjectAgentsPage({ params }: ProjectAgentsPagePro
   try {
     agents = await AgentService.getProjectAgents(projectId, userId); // Call service directly
   } catch (error: any) {
-    console.error(`Failed to load agents for project ${projectId}:`, error);
+    clientLogger.error(`Failed to load agents for project ${projectId}:`, error);
     fetchError = error.message || 'Could not load agents for this project.';
   }
 
@@ -75,7 +78,7 @@ export default async function ProjectAgentsPage({ params }: ProjectAgentsPagePro
         <Card className="text-center py-10">
           <CardHeader>
             <CardTitle>No Agents Found</CardTitle>
-            <CardDescription>This project doesn\'t have any agents yet.</CardDescription>
+            <CardDescription>This project doesn&apos;t have any agents yet.</CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild>
@@ -88,31 +91,45 @@ export default async function ProjectAgentsPage({ params }: ProjectAgentsPagePro
       )}
 
       {!fetchError && agents.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {agents.map((agent) => (
-            <Card key={agent.id}>
-              <CardHeader>
-                <CardTitle className="truncate">{agent.name}</CardTitle>
-                <CardDescription className="truncate">
-                  Provider: {agent.config?.provider || 'N/A'} | Model: {agent.config?.model || 'N/A'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground space-y-1">
-                <p className="line-clamp-3 h-[3.75rem]">{agent.description || 'No description available.'}</p>
-                <p>Public: {agent.is_public ? 'Yes' : 'No'}</p>
-              </CardContent>
-              <CardFooter className="flex justify-end gap-2">
-                {/* Placeholder for future actions */}
-                <Button variant="outline" size="sm" asChild>
-                    <Link href={`/projects/${projectId}/agents/${agent.id}/edit`}> 
-                        <Pencil2Icon className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                    </Link>
-                </Button>
-                {/* <Button variant="destructive" size="sm" disabled> <TrashIcon className="h-4 w-4" /> <span className="sr-only">Delete</span> </Button> */}
-              </CardFooter>
-            </Card>
-          ))}
+        <div style={{ height: 600 }}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                height={height}
+                width={width}
+                itemCount={agents.length}
+                itemSize={220}
+              >
+                {({ index, style }) => {
+                  const agent = agents[index];
+                  return (
+                    <div style={style} className="p-2">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="truncate">{agent.name}</CardTitle>
+                          <CardDescription className="truncate">
+                            Provider: {agent.config?.provider || 'N/A'} | Model: {agent.config?.model || 'N/A'}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="text-sm text-muted-foreground space-y-1">
+                          <p className="line-clamp-3 h-[3.75rem]">{agent.description || 'No description available.'}</p>
+                          <p>Public: {agent.is_public ? 'Yes' : 'No'}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={`/projects/${projectId}/agents/${agent.id}/edit`}>
+                              <Pencil2Icon className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Link>
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    </div>
+                  );
+                }}
+              </List>
+            )}
+          </AutoSizer>
         </div>
       )}
     </div>

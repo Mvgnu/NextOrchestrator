@@ -3,6 +3,7 @@
 // import { v4 as uuidv4 } from 'uuid'; // No longer needed for ID generation here
 
 import { query } from './db'; // Import our PostgreSQL query function
+import logger from './logger'
 
 // Define a local Project type based on our schema
 export interface Project {
@@ -35,7 +36,7 @@ export async function getProjects(userId: string): Promise<Project[]> {
     const { rows } = await query(sql, [userId]);
     return rows;
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    logger.error({ error }, 'Error fetching projects');
     throw new Error('Failed to fetch projects');
   }
 }
@@ -49,7 +50,7 @@ export async function getProject(projectId: string, userId: string): Promise<Pro
     const { rows } = await query(sql, [projectId, userId]);
     return rows[0] || null;
   } catch (error) {
-    console.error('Error fetching project:', error);
+    logger.error({ error }, 'Error fetching project');
     throw new Error('Failed to fetch project');
   }
 }
@@ -67,7 +68,7 @@ export async function createProject(project: ProjectCreate): Promise<Project> {
     const { rows } = await query(sql, [project.name, project.description || null, project.user_id]);
     return rows[0];
   } catch (error) {
-    console.error('Error creating project:', error);
+    logger.error({ error }, 'Error creating project');
     // Consider more specific error handling or re-throwing a custom error
     // For now, re-throw the original error message if available, or a generic one
     const errorMessage = error instanceof Error ? error.message : 'Failed to create project';
@@ -115,7 +116,7 @@ export async function updateProject(projectId: string, userId: string, updates: 
     const { rows } = await query(sql, values);
     return rows[0] || null;
   } catch (error) {
-    console.error('Error updating project:', error);
+    logger.error({ error }, 'Error updating project');
     const errorMessage = error instanceof Error ? error.message : 'Failed to update project';
     throw new Error(errorMessage);
   }
@@ -130,7 +131,7 @@ export async function deleteProject(projectId: string, userId: string): Promise<
     const result = await query(sql, [projectId, userId]);
     return result.rowCount !== null && result.rowCount > 0; // Check for null before comparing
   } catch (error) {
-    console.error('Error deleting project:', error);
+    logger.error({ error }, 'Error deleting project');
     throw new Error('Failed to delete project');
   }
 }
@@ -144,7 +145,7 @@ export async function userHasAccessToProject(userId: string, projectId: string):
     const { rows } = await query(sql, [projectId, userId]);
     return rows.length > 0;
   } catch (error) {
-    console.error('Error checking project access:', error);
+    logger.error({ error }, 'Error checking project access');
     return false; // Typically, if access check fails due to error, assume no access
   }
 } 

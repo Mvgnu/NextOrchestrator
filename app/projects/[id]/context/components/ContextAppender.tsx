@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FileText, CheckCircle, RefreshCw } from 'lucide-react'
 import { ContextDigest } from '@/app/services/contextService'
 import { v4 as uuidv4 } from 'uuid'
+import clientLogger from '@/lib/client-logger'
 
 interface ContextAppenderProps {
   contextDigest: ContextDigest | null
@@ -64,7 +65,7 @@ This enhanced context has been structured to integrate seamlessly with your exis
       setAiContent(enhancedContent)
       setActiveTab('ai')
     } catch (error) {
-      console.error('Error generating AI content:', error)
+      clientLogger.error('Error generating AI content:', error)
     } finally {
       setLoading(false)
     }
@@ -104,7 +105,7 @@ This enhanced context has been structured to integrate seamlessly with your exis
       
       setAppendComplete(true)
     } catch (error) {
-      console.error('Error appending to context:', error)
+      clientLogger.error('Error appending to context:', error)
     } finally {
       setLoading(false)
     }

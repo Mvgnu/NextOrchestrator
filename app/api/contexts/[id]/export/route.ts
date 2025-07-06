@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { ContextService } from '@/lib/context-service';
+import logger from '@/lib/logger';
 
 interface ExportRequestBody {
   format: 'markdown' | 'html'; // Removed 'pdf' for now
@@ -16,11 +17,17 @@ export async function POST(
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
-    // TODO: Add check if user has access to this contextId via project ownership or sharing
-
     const { contextId } = params;
     if (!contextId) {
       return NextResponse.json({ message: 'Context ID is required' }, { status: 400 });
+    }
+    // Verify user owns the context (or has been granted access)
+    const hasAccess = await ContextService.userHasAccessToContext(
+      session.user.id,
+      contextId
+    )
+    if (!hasAccess) {
+      return NextResponse.json({ message: 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json() as ExportRequestBody;
@@ -83,7 +90,7 @@ export async function POST(
     });
 
   } catch (error: any) {
-    console.error(`Error exporting context ${params.contextId} as ${req.method} request:`, error);
+    logger.error({ err: error, contextId: params.contextId, method: req.method }, 'Error exporting context');
     return NextResponse.json({ message: error.message || 'Internal server error' }, { status: 500 });
   }
-} 
+}

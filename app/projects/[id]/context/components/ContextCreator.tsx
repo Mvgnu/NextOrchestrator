@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/components/ui/use-toast'
+import clientLogger from '@/lib/client-logger'
 
 interface Message {
   id: string
@@ -118,7 +119,7 @@ export default function ContextCreator({
       const agentResponse = await generateAgentResponse(inputValue)
       setMessages(prev => [...prev, agentResponse])
     } catch (error) {
-      console.error('Error generating agent response:', error)
+      clientLogger.error('Error generating agent response:', error)
       toast({
         title: "Agent Error",
         description: "Failed to get response from agent.",
@@ -168,7 +169,7 @@ ${userMessages.slice(5).join('\n\n') || 'None'}
         const digestedContent = await ContextClient.digestContent(draftContent, "Project Context Document");
         setContextContent(digestedContent);
       } catch (error) {
-        console.error("Digest error, falling back to draft:", error);
+        clientLogger.error("Digest error, falling back to draft:", error);
         setContextContent(draftContent);
         toast({
           title: "Digest Warning",
@@ -179,7 +180,7 @@ ${userMessages.slice(5).join('\n\n') || 'None'}
       
       setActiveTab('preview')
     } catch (error) {
-      console.error('Error generating context:', error)
+      clientLogger.error('Error generating context:', error)
       toast({
         title: "Generation Error",
         description: "Failed to generate context preview.",
@@ -221,7 +222,7 @@ ${userMessages.slice(5).join('\n\n') || 'None'}
       setContextComplete(true)
 
     } catch (error: any) {
-      console.error('Error saving context:', error)
+      clientLogger.error('Error saving context:', error)
       const errMsg = error.message || 'An unknown error occurred.'
       if (errMsg.includes('violates row-level security policy')) {
          setSaveError('Error: Permission denied. Could not save context due to security policy. Please check database rules.')

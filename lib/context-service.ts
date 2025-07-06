@@ -1,4 +1,5 @@
-import { query } from './db'; // Import our PostgreSQL query function
+import { query } from './db' // Import our PostgreSQL query function
+import logger from './logger'
 // import supabase from './supabase' // Removed Supabase
 // import { Database, Json } from '@/types/supabase' // Removed Supabase types
 import OpenAI from 'openai'
@@ -64,7 +65,7 @@ export const ContextService = {
       const { rows } = await query(sql, [projectId]);
       return rows;
     } catch (error) {
-      console.error('Error fetching contexts:', error);
+      logger.error({ error }, 'Error fetching contexts');
       throw new Error('Failed to fetch contexts');
     }
   },
@@ -139,7 +140,7 @@ export const ContextService = {
       const total = parseInt(countResult.rows[0].count, 10) || 0;
       return { contexts: rows, total };
     } catch (error) {
-      console.error('Error searching contexts:', error);
+      logger.error({ error }, 'Error searching contexts');
       throw new Error('Failed to search contexts');
     }
   },
@@ -153,7 +154,7 @@ export const ContextService = {
       const { rows } = await query(sql, [contextId]);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error fetching context:', error);
+      logger.error({ error }, 'Error fetching context');
       throw new Error('Failed to fetch context');
     }
   },
@@ -172,7 +173,7 @@ export const ContextService = {
       const { rows } = await query(sql, [contextIds, userId]);
       return rows;
     } catch (error) {
-      console.error('Error fetching contexts by IDs for user:', userId, error);
+      logger.error({ userId, error }, 'Error fetching contexts by IDs');
       throw new Error('Failed to fetch contexts by IDs');
     }
   },
@@ -199,7 +200,7 @@ export const ContextService = {
       ]);
       return rows[0];
     } catch (error) {
-      console.error('Error creating context:', error);
+      logger.error({ error }, 'Error creating context');
       const errorMessage = error instanceof Error ? error.message : 'Failed to create context';
       throw new Error(errorMessage);
     }
@@ -250,7 +251,7 @@ export const ContextService = {
       const { rows } = await query(sql, values);
       return rows[0] || null;
     } catch (error) {
-      console.error('Error updating context:', error);
+      logger.error({ error }, 'Error updating context');
       const errorMessage = error instanceof Error ? error.message : 'Failed to update context';
       throw new Error(errorMessage);
     }
@@ -265,17 +266,48 @@ export const ContextService = {
       const result = await query(sql, [contextId]);
       return result.rowCount !== null && result.rowCount > 0;
     } catch (error) {
-      console.error('Error deleting context:', error);
+      logger.error({ error }, 'Error deleting context');
       throw new Error('Failed to delete context');
     }
   },
 
-  // --- STUBBED/TODO: More complex methods to be refactored later ---
+  /**
+   * Check if a user has access to a context
+   */
+  async userHasAccessToContext(userId: string, contextId: string): Promise<boolean> {
+    const sql = `SELECT id FROM contexts WHERE id = $1 AND user_id = $2`;
+    try {
+      const { rows } = await query(sql, [contextId, userId]);
+      return rows.length > 0;
+    } catch (error) {
+      logger.error({ error }, 'Error checking context access');
+      return false;
+    }
+  },
 
-  // async shareContext(contextId: string, targetProjectId: string): Promise<Context> {
-  //   console.warn('shareContext not implemented yet for PostgreSQL');
-  //   throw new Error('Not implemented');
-  // },
+  /**
+   * Duplicate a context into another project owned by the user.
+   */
+  async shareContext(
+    contextId: string,
+    targetProjectId: string,
+    userId: string
+  ): Promise<Context> {
+    const context = await this.getContext(contextId)
+    if (!context) throw new Error('Context not found')
+    if (context.user_id !== userId)
+      throw new Error('Permission denied for sharing context')
+
+    return this.createContext({
+      project_id: targetProjectId,
+      user_id: userId,
+      name: context.name,
+      content: context.content,
+      digest: context.digest,
+      metadata: context.metadata ?? null
+    })
+  },
+
 
   /**
    * Get all unique tags for a specific project, for contexts owned by the user.
@@ -291,7 +323,7 @@ export const ContextService = {
       const { rows } = await query(sql, [projectId, userId]);
       return rows.map(row => row.tag);
     } catch (error) {
-      console.error('Error fetching project tags:', error);
+      logger.error({ error }, 'Error fetching project tags');
       throw new Error('Failed to fetch project tags');
     }
   },
@@ -302,9 +334,9 @@ export const ContextService = {
   // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   async digestToMarkdown(content: string, title: string): Promise<string> {
-    console.warn('digestToMarkdown: Review OpenAI integration and ensure env vars (OPENAI_API_KEY) are loaded.');
+    logger.warn('digestToMarkdown: Review OpenAI integration and ensure env vars (OPENAI_API_KEY) are loaded.');
     if (!process.env.OPENAI_API_KEY) {
-        console.error('OpenAI API key not found.');
+        logger.error('OpenAI API key not found.');
         return `# ${title}\n\n(OpenAI API key not configured. Digest not available.)\n\n${content.substring(0, 200)}...`;
     }
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -326,7 +358,7 @@ export const ContextService = {
         });
         return response.choices[0]?.message?.content || `# ${title}\n\n(Error generating digest)\n\n${content.substring(0,200)}...`;
     } catch (error) {
-        console.error('Error calling OpenAI for digest:', error);
+        logger.error({ error }, 'Error calling OpenAI for digest');
         return `# ${title}\n\n(Error generating digest: ${error instanceof Error ? error.message : 'Unknown error'})\n\n${content.substring(0,200)}...`;
     }
   },
@@ -337,7 +369,7 @@ export const ContextService = {
   },
   
   async combineProjectContexts(projectId: string): Promise<string> {
-    console.warn('combineProjectContexts: Fetching contexts using new service method.');
+    logger.warn('combineProjectContexts: Fetching contexts using new service method.');
     const contexts = await this.getProjectContexts(projectId);
     if (!contexts || contexts.length === 0) return "No contexts found for this project.";
     return contexts.map(ctx => `# ${ctx.name}\n${ctx.content || ''}`).join('\n\n---\n\n');
@@ -347,9 +379,9 @@ export const ContextService = {
     suggestedCategory: ContextCategory,
     suggestedTags: string[]
   }> {
-    console.warn('suggestMetadata: Review OpenAI integration.');
+    logger.warn('suggestMetadata: Review OpenAI integration.');
      if (!process.env.OPENAI_API_KEY) {
-        console.error('OpenAI API key not found for metadata suggestion.');
+        logger.error('OpenAI API key not found for metadata suggestion.');
         return { suggestedCategory: 'other', suggestedTags: [] };
     }
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -376,7 +408,7 @@ export const ContextService = {
              suggestedTags: result.tags || []
         };
     } catch (error) {
-        console.error('Error calling OpenAI for metadata suggestion:', error);
+        logger.error({ error }, 'Error calling OpenAI for metadata suggestion');
         return { suggestedCategory: 'other', suggestedTags: [] };
     }
   },

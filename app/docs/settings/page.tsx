@@ -21,11 +21,11 @@ export default function DocsSettingsPage() {
       </p>
       <ul>
         <li>Navigate to the API Keys section within your account settings.</li>
-        <li>Click "Add New Key".</li>
+          <li>Click &quot;Add New Key&quot;.</li>
         <li>Select the <strong>Provider</strong> from the dropdown list.</li>
-        <li>Give the key a recognizable <strong>Name</strong> (e.g., "My Personal OpenAI Key").</li>
+          <li>Give the key a recognizable <strong>Name</strong> (e.g., &quot;My Personal OpenAI Key&quot;).</li>
         <li>Paste your <strong>API Key</strong> into the designated field. Your key will be encrypted for security.</li>
-        <li>Ensure the key is marked as "Active" if you want agents to be able to use it.</li>
+          <li>Ensure the key is marked as &quot;Active&quot; if you want agents to be able to use it.</li>
         <li>You can deactivate, edit the name of, or delete keys as needed.</li>
       </ul>
       <blockquote className="border-l-4 border-blue-500 pl-4 my-4">
@@ -53,7 +53,7 @@ export default function DocsSettingsPage() {
       </p>
       <ul>
           <li><strong>Profile Information:</strong> Your name, email, and avatar (as provided by your login method) are displayed in the user account menu. Functionality for directly editing profile details within MARS Next might be limited.</li>
-          <li><strong>Preferences:</strong> An explicit "Preferences" section might exist for future settings (e.g., notifications), but specific options are not yet documented.</li>
+          <li><strong>Preferences:</strong> An explicit &quot;Preferences&quot; section might exist for future settings (e.g., notifications), but specific options are not yet documented.</li>
       </ul>
       <blockquote className="border-l-4 border-yellow-500 pl-4 my-4">
         {/* Other settings mentioned above; specific implementations like notification preferences are not yet documented/implemented. */}
@@ -62,13 +62,13 @@ export default function DocsSettingsPage() {
       <h2>Project Settings</h2>
       <p>
         Settings specific to an individual project can be accessed by navigating to the 
-        <a href="/docs/projects">Project Page</a> and clicking the "Settings" button in the header.
+        <a href="/docs/projects">Project Page</a> and clicking the &quot;Settings&quot; button in the header.
       </p>
       <p>
         Refer to the <a href="/docs/projects#project-settings">Project Settings documentation</a> within the Managing Projects section for details on available options.
       </p>
       <blockquote className="border-l-4 border-yellow-500 pl-4 my-4">
-        <p><strong>TODO:</strong> Ensure the Project Settings section linked above is kept up-to-date as features like collaborator management are added.</p>
+        <p><strong>Note:</strong> This section will evolve as features like collaborator management are introduced. Be sure to keep the linked documentation current.</p>
       </blockquote>
 
     </article>

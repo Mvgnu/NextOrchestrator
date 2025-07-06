@@ -12,14 +12,14 @@ export default function DocsProjectsPage() {
       <h2>Creating a New Project</h2>
       <p>
         You can create a new project directly from your main <a href="/dashboard">Dashboard</a> 
-        by clicking the "New Project" button. This will take you to a simple form where you need to provide:
+        by clicking the &quot;New Project&quot; button. This will take you to a simple form where you need to provide:
       </p>
       <ul>
-        <li><strong>Name:</strong> A required, descriptive name for your project (e.g., "Q3 Marketing Strategy", "Competitor Analysis").</li>
-        <li><strong>Description (Optional):</strong> A brief summary of the project's purpose.</li>
+        <li><strong>Name:</strong> A required, descriptive name for your project (e.g., &quot;Q3 Marketing Strategy&quot;, &quot;Competitor Analysis&quot;).</li>
+          <li><strong>Description (Optional):</strong> A brief summary of the project&apos;s purpose.</li>
       </ul>
       <p>
-        Upon creation, you'll be redirected to the project's main page.
+        Upon creation, you&apos;ll be redirected to the project&apos;s main page.
       </p>
 
       <h2>The Project Page</h2>
@@ -39,11 +39,11 @@ export default function DocsProjectsPage() {
       </p>
       <ul>
         <li>See a list of existing contexts with their names and creation dates.</li>
-        <li>Click the "Add Context" button to create a new context document.</li>
-        <li>Click "View" on a specific context to see its content and details.</li>
+          <li>Click the &quot;Add Context&quot; button to create a new context document.</li>
+          <li>Click &quot;View&quot; on a specific context to see its content and details.</li>
       </ul>
       <blockquote className="border-l-4 border-blue-500 pl-4 my-4">
-          <p><strong>Connection:</strong> Contexts listed here are available for selection within the project's <a href="/docs/chat">Chat Interface</a> to provide relevant information to your Agents.</p>
+            <p><strong>Connection:</strong> Contexts listed here are available for selection within the project&apos;s <a href="/docs/chat">Chat Interface</a> to provide relevant information to your Agents.</p>
       </blockquote>
 
       <h3>Agents Tab</h3>
@@ -53,16 +53,16 @@ export default function DocsProjectsPage() {
       </p>
       <ul>
         <li>See a list of existing agents, their names, descriptions, base model, and temperature setting.</li>
-        <li>Click the "Create Agent" button to configure a new agent.</li>
-        <li>"Edit" or "Delete" existing agents.</li>
+          <li>Click the &quot;Create Agent&quot; button to configure a new agent.</li>
+          <li>&quot;Edit&quot; or &quot;Delete&quot; existing agents.</li>
       </ul>
       <blockquote className="border-l-4 border-blue-500 pl-4 my-4">
-          <p><strong>Connection:</strong> Agents configured here can be selected within the project's <a href="/docs/chat">Chat Interface</a> to perform tasks using the selected Contexts.</p>
+            <p><strong>Connection:</strong> Agents configured here can be selected within the project&apos;s <a href="/docs/chat">Chat Interface</a> to perform tasks using the selected Contexts.</p>
       </blockquote>
 
       <h2 id="project-settings">Project Settings</h2>
       <p>
-        Each project has its own settings page, accessible via the "Settings" button in the project header. 
+        Each project has its own settings page, accessible via the &quot;Settings&quot; button in the project header.
         Currently, project settings primarily allow:
       </p>
       <ul>
@@ -75,7 +75,7 @@ export default function DocsProjectsPage() {
 
       <h2>Navigating Between Projects</h2>
       <p>
-        You can always return to your main <a href="/dashboard">Dashboard</a> using the global header or the "Back to Dashboard" link 
+        You can always return to your main <a href="/dashboard">Dashboard</a> using the global header or the &quot;Back to Dashboard&quot; link
         on the project page to see and select other projects.
       </p>
     </article>

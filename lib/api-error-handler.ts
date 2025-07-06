@@ -1,5 +1,6 @@
 import { AIProvider } from './ai-config'
 import { ApiUsageService } from './api-usage-service'
+import logger from './logger'
 
 // Error types for different providers
 export enum ApiErrorType {
@@ -433,7 +434,7 @@ export const ApiErrorHandler = {
         }
       })
     } catch (error) {
-      console.error('Failed to track API error:', error)
+      logger.error({ error }, 'Failed to track API error')
       // Silently continue if tracking fails
     }
   },

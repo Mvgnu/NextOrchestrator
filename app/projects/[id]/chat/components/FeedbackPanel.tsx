@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import clientLogger from '@/lib/client-logger'
 import { 
   Dialog,
   DialogContent,
@@ -118,7 +119,7 @@ export default function FeedbackPanel({
         onFeedbackSubmitted();
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      clientLogger.error('Error submitting feedback:', error);
     } finally {
       setLoading(false);
     }
@@ -292,7 +293,7 @@ export default function FeedbackPanel({
                 <DialogHeader>
                   <DialogTitle>Provide Feedback on {agent.name}</DialogTitle>
                   <DialogDescription>
-                    Your feedback helps us improve the agent's responses.
+                    Your feedback helps us improve the agent&apos;s responses.
                   </DialogDescription>
                 </DialogHeader>
                 {renderFeedbackForm()}

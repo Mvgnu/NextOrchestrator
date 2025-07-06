@@ -28,6 +28,7 @@ import agentAssignmentService, {
 } from '@/app/services/agentAssignmentService'
 import * as AgentClient from '@/lib/agent-client'
 import { useToast } from '@/components/ui/use-toast'
+import clientLogger from '@/lib/client-logger'
 import Link from 'next/link'
 
 interface AgentAssignmentPanelProps {
@@ -77,7 +78,7 @@ export default function AgentAssignmentPanel({
           setSelectedAgentId(agentsData[0].id)
         }
       } catch (error) {
-        console.error('Error fetching agents:', error)
+        clientLogger.error('Error fetching agents:', error)
         toast({
           title: "Error",
           description: "Failed to load agents",
@@ -136,7 +137,7 @@ export default function AgentAssignmentPanel({
       })
       
     } catch (error) {
-      console.error('Error saving assignment:', error)
+      clientLogger.error('Error saving assignment:', error)
       toast({
         title: "Error",
         description: "Failed to assign agent",

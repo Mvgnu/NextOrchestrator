@@ -8,6 +8,7 @@ import ChatInterface from '@/components/ChatInterface';
 import * as ProjectService from '@/lib/project-service';
 import { Button } from '@/components/ui/button'
 import { ContextService, type Context } from '@/lib/context-service'; // Import Context type
+import clientLogger from '@/lib/client-logger'
 import { AgentService, type Agent } from '@/lib/agent-service'; // Import AgentService and Agent type
 // import { cookies } from 'next/headers'; // No longer needed for fetchProjectAgents
 
@@ -48,7 +49,7 @@ export default async function ProjectChatPage({ params }: ProjectChatPageProps) 
     // Check project existence and user access first
     const project = await ProjectService.getProject(projectId, userId);
     if (!project) {
-      console.warn(`Project ${projectId} not found or user ${userId} lacks access.`);
+      clientLogger.warn(`Project ${projectId} not found or user ${userId} lacks access.`);
       notFound(); // Project does not exist or user lacks access
     }
 
@@ -68,7 +69,7 @@ export default async function ProjectChatPage({ params }: ProjectChatPageProps) 
     }));
 
   } catch (error) {
-    console.error("Error loading chat page data:", error);
+    clientLogger.error("Error loading chat page data:", error);
     fetchError = error instanceof Error ? error.message : "Failed to load chat data.";
   }
 
@@ -87,7 +88,7 @@ export default async function ProjectChatPage({ params }: ProjectChatPageProps) 
       <div className="flex flex-col items-center justify-center h-screen p-4">
         <h2 className="text-xl font-semibold mb-2">No Agents Found</h2>
         <p className="text-muted-foreground mb-4 text-center">
-          This project doesn't have any agents yet. You need at least one agent to start chatting.
+          This project doesn&apos;t have any agents yet. You need at least one agent to start chatting.
         </p>
         <Button asChild>
           <a href={`/projects/${projectId}/agents/new`}>Create New Agent</a>

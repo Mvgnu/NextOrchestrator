@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ContextService } from '@/lib/context-service'
 import { auth } from "@/lib/auth"
+import logger from '@/lib/logger'
 
 /**
  * @swagger
@@ -99,7 +100,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result); // Expect { contexts: [], total: 0 }
   } catch (error) {
-    console.error('Error fetching contexts:', error);
+    logger.error({ err: error }, 'Error fetching contexts');
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
@@ -153,7 +154,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     
-    console.log('🔎 API /contexts session →', session)
+    logger.debug({ session }, 'API /contexts session')
     
     if (!session?.user) {
       return NextResponse.json(
@@ -184,10 +185,10 @@ export async function POST(req: NextRequest) {
       user_id: userId
     }
     
-    console.log("Creating context with data:", {
+    logger.debug({ data: {
       ...contextData,
       content: contextData.content?.substring(0, 100) + (contextData.content?.length > 100 ? '...' : '')
-    })
+    } }, 'Creating context')
 
     const context = await ContextService.createContext(contextData)
     
@@ -196,13 +197,13 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     )
   } catch (error: any) {
-    console.error('Error creating context:', error)
+    logger.error({ err: error }, 'Error creating context')
     // Generalized error logging
     const errorCode = error?.code // For PG errors or other system errors
     const errorDetails = error?.details // Standard property for some errors
     const errorMessage = error?.message || 'Unknown error'
     
-    console.error(`Error Code: ${errorCode}, Details: ${errorDetails}, Message: ${errorMessage}`)
+    logger.error({ code: errorCode, details: errorDetails }, errorMessage)
 
     return NextResponse.json(
       { 

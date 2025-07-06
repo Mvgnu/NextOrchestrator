@@ -4,15 +4,15 @@ export default function DocsChatPage() {
       <h1>Using the Chat Interface</h1>
 
       <p>
-        The Chat Interface is where you interact directly with the AI Agents you've configured 
+        The Chat Interface is where you interact directly with the AI Agents you&apos;ve configured
         for your project. You can ask questions, give instructions, and have conversations, 
-        leveraging the agents' abilities and the project's context documents.
+        leveraging the agents&apos; abilities and the project&apos;s context documents.
       </p>
 
       <h2>Accessing the Chat</h2>
       <p>
         To open the chat for a specific project, navigate to the <a href="/docs/projects">Project Page</a> 
-        and click the "Open Chat" button in the header.
+          and click the &quot;Open Chat&quot; button in the header.
       </p>
 
       <h2>Chat Layout</h2>
@@ -45,13 +45,13 @@ export default function DocsChatPage() {
         <li><strong>Select Agent(s):</strong> Choose the agent(s) suitable for your current task from the selector.</li>
         <li><strong>Select Context(s):</strong> Choose the relevant context documents the agent(s) should use.</li>
         <li><strong>Type Your Message:</strong> Enter your question, instruction, or prompt in the input field.</li>
-        <li><strong>Send:</strong> Click the "Send" button or press Enter.</li>
+          <li><strong>Send:</strong> Click the &quot;Send&quot; button or press Enter.</li>
         <li><strong>View Response:</strong> The agent(s) will process your request using the selected context, and their response(s) will appear in the message history.</li>
       </ol>
       <p>
           This interaction is powered by the `/api/projects/[projectId]/chat` API endpoint.
           This endpoint takes your message, selected agent configuration, context document identifiers, 
-          and conversation history, then streams the agent's response back to the interface.
+            and conversation history, then streams the agent&apos;s response back to the interface.
       </p>
       <blockquote className="border-l-4 border-yellow-500 pl-4 my-4">
           <p><strong>API Implementation Status:</strong></p>
